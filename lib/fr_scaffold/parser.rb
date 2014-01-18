@@ -1,4 +1,4 @@
-# encoding: utf-8
+# coding: utf-8
 
 LANGUAGE_REGEX = /### (?<language>.+) +first +commit *$/u
 FNAME_REGEX = /^(?<fname>.*)(?:を?作成(?:する)?) *$/u
