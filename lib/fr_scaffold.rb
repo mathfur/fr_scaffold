@@ -6,6 +6,7 @@ require 'fileutils'
 
 require "fr_scaffold/version"
 require "fr_scaffold/parser"
+require "fr_scaffold/main"
 require "helper"
 
 BASE_DIR = "#{File.dirname(__FILE__)}/.."
