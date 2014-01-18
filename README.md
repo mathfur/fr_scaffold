@@ -1,4 +1,4 @@
-MyScaffold
+FrScaffold
 ==================
 STATUS: Experimental
 
@@ -9,9 +9,12 @@ Install
 
 Usage
 -----
- 1. ~/.my_scaffold/tmp下に言語名などのディレクトリ作成, その下にひな形filesを置く
- 1. ruby bin/main.rb実行
- 2.
+ 1. ~/.fr_scaffold/tmp下に言語名などのディレクトリ作成, その下にひな形filesを置く
+ 2. ruby bin/main.rb実行
+
+Code Status
+------------------
+![build status](https://travis-ci.org/mathfur/fr_scaffold.png)
 
 License
 -------
