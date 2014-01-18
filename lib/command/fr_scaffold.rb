@@ -5,6 +5,7 @@ require 'getoptlong'
 
 usage = <<EOS
 Usage: fr_scaffold [options]
+-h --help    Display help.
 -v --version Display version information and exit.
 EOS
 
