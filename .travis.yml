@@ -1,7 +1,7 @@
 language: ruby
-install:
-  - cabal update
-  - cabal install pandoc
+before_install:
+ - sudo apt-get update -qq
+ - sudo apt-get install -qq pandoc
 script: rspec
 rvm:
   - 2.0.0
