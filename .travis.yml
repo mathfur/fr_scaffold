@@ -1,4 +1,7 @@
 language: ruby
+before_script:
+  - cabal update
+  - cabal install pandoc
 script: rspec
 rvm:
   - 2.0.0
