@@ -1,6 +1,9 @@
 language: ruby
 script: rspec
 rvm:
+  - 2.0.0
   - 1.9.3
+  - jruby
+  - rbx
 gemfile:
   - Gemfile
