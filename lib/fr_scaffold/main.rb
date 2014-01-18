@@ -47,7 +47,7 @@ module FrScaffold
     def self.header_name(header)
       raise "#{header.inspect} has to be Header element" if !header || !self.header?(header)
 
-      header[1][0]
+      header.last[0]["Str"]
     end
 
     def self.para_name(para)
@@ -64,9 +64,9 @@ module FrScaffold
 
     def self.header?(header)
       header.kind_of?(Array) &&
-      header.size == 3 &&
-      header[1].kind_of?(Array) &&
-      header[1][0].kind_of?(String)
+      header.last.kind_of?(Array) &&
+      header.last[0].kind_of?(Hash) &&
+      header.last[0]["Str"].kind_of?(String)
     end
 
     def self.para?(para)

@@ -12,9 +12,9 @@ describe FrScaffold::Main do
   describe '.header?' do
     specify "headerと認識されない例" do
       Main.header?(nil).should be_false
-      Main.header?([1, {}, [{"Str" => "初期作成"}]]).should be_false
-      Main.header?([2, [nil, [], []], [{"Str" => "初期作成"}]]).should be_false
-      Main.header?([3, ["C初期ファイル", [], []]]).should be_false
+      Main.header?([1, [], []]).should be_false
+      Main.header?([1, [], [{}]]).should be_false
+      Main.header?([2, [nil, [], []], [{"Str" => nil}]]).should be_false
     end
 
     specify "headerと認識される例" do
@@ -50,8 +50,8 @@ describe FrScaffold::Main do
 
   describe '.header_name' do
     specify "2個目の要素の先頭要素を名前として取得する" do
-      Main.header_name([1, ["ruby初期ファイル", [], []], [{"Str" => "初期作成"}]]).should == "ruby初期ファイル"
-      Main.header_name([2, ["C初期ファイル", [], []], [{"Str" => "他のラベル"}]]).should == "C初期ファイル"
+      Main.header_name([1, ["ruby初期ファイル", [], []], [{"Str" => "ruby初期ファイル"}]]).should == "ruby初期ファイル"
+      Main.header_name([2, ["その他", [], []], [{"Str" => "C初期ファイル"}]]).should == "C初期ファイル"
     end
 
     specify "header?でなければRuntimeError" do
@@ -106,7 +106,7 @@ describe FrScaffold::Main do
   describe "TODO" do
     specify "" do
       @main.data = [
-        {"Header" => [1, ["ruby初期設定", [], []], [{"Str" => "初期作成"}]]},
+        {"Header" => [1, ["その他", [], []], [{"Str" => "ruby初期設定"}]]},
         {"Para"   => [{"Str" => ".gitignore"}]},
         {"CodeBlock" => [["", ["ruby"], []], %Q!tmp/!]}
       ]
@@ -120,7 +120,7 @@ describe FrScaffold::Main do
 
     specify "#info" do
       @main.data = [
-        {"Header" => [1, ["ruby初期設定", [], []], [{"Str" => "初期作成"}]]},
+        {"Header" => [1, ["ruby初期設定", [], []], [{"Str" => "ruby初期設定"}]]},
         {"Para"   => [{"Str" => ".gitignore"}]},
         {"CodeBlock" => [["", [], []], %Q!tmp/!]},
         {"Para"   => [{"Str" => "lib/アプリ名.rb"}]},
