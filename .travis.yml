@@ -1,5 +1,5 @@
 language: ruby
-before_script:
+install:
   - cabal update
   - cabal install pandoc
 script: rspec
