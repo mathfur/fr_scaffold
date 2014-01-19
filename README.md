@@ -2,15 +2,9 @@ FrScaffold
 ==================
 STATUS: Experimental
 
-Install
--------
- 1.
- 2.
-
 Usage
 -----
- 1. ~/.fr_scaffold/tmp下に言語名などのディレクトリ作成, その下にひな形filesを置く
- 2. ruby bin/main.rb実行
+ 1. bin/fr_scaffold --version
 
 Code Status
 ------------------
