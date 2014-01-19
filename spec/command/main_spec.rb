@@ -59,7 +59,7 @@ end
 EOS
 
       json[1][2]["Header"].first.should == 2
-      json[1][2]["Header"].last.last.should == {"Str" => "〜～申能表"}
+      json[1][2]["Header"].last.last["Str"].should =~ /\A(〜～|)申能表\Z/  # 〜～が取り除かれる場合と取り除かれない場合がある
       json[1][3]["Para"].should == [{"Str" => "あああ"}]
     end
 
