@@ -13,8 +13,8 @@ script:
 rvm:
   - 2.0.0
   - 1.9.3
-  - jruby
-  - rbx
+  #- jruby
+  #- rbx
 
 gemfile:
   - Gemfile
