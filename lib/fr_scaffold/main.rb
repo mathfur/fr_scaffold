@@ -47,7 +47,7 @@ module FrScaffold
     def self.header_name(header)
       raise "#{header.inspect} has to be Header element" if !header || !self.header?(header)
 
-      header.last[0]["Str"]
+      header.last.map{|e| e["Str"] }.join
     end
 
     def self.para_name(para)
@@ -65,8 +65,7 @@ module FrScaffold
     def self.header?(header)
       header.kind_of?(Array) &&
       header.last.kind_of?(Array) &&
-      header.last[0].kind_of?(Hash) &&
-      header.last[0]["Str"].kind_of?(String)
+      header.last.all?{|e| e.kind_of?(Hash) && e["Str"].kind_of?(String) }
     end
 
     def self.para?(para)

@@ -12,13 +12,14 @@ describe FrScaffold::Main do
   describe '.header?' do
     specify "headerと認識されない例" do
       Main.header?(nil).should be_false
-      Main.header?([1, [], []]).should be_false
       Main.header?([1, [], [{}]]).should be_false
       Main.header?([2, [nil, [], []], [{"Str" => nil}]]).should be_false
     end
 
     specify "headerと認識される例" do
+      Main.header?([1, [], []]).should be_true
       Main.header?([1, ["初期作成", [], []], [{"Str" => "初期作成"}]]).should be_true
+      Main.header?([1, ["初期作成", [], []], [{"Str" => "aaa"}, {"Str" => "初期作成"}]]).should be_true
     end
   end
 
@@ -52,6 +53,7 @@ describe FrScaffold::Main do
     specify "2個目の要素の先頭要素を名前として取得する" do
       Main.header_name([1, ["ruby初期ファイル", [], []], [{"Str" => "ruby初期ファイル"}]]).should == "ruby初期ファイル"
       Main.header_name([2, ["その他", [], []], [{"Str" => "C初期ファイル"}]]).should == "C初期ファイル"
+      Main.header_name([2, ["その他", [], []], [{"Str" => "aa"}, {"Str" => "C初期ファイル"}]]).should == "aaC初期ファイル"
     end
 
     specify "header?でなければRuntimeError" do
