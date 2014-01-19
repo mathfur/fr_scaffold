@@ -1,13 +1,20 @@
 language: ruby
+
 before_install:
  - sudo apt-get update -qq
  - sudo apt-get install -qq pandoc
  - pandoc --version
-script: rspec
+
+script:
+ - rspec
+ - bin/fr_scaffold --help
+ - bin/fr_scaffold --version
+
 rvm:
   - 2.0.0
   - 1.9.3
   - jruby
   - rbx
+
 gemfile:
   - Gemfile
