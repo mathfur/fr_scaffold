@@ -22,7 +22,8 @@ EOS
       json = JSON.parse(`pandoc --from=markdown --to=json #{fname}`)
 
       json.size.should == 2
-      json[1][0]["Header"].should == [1, ["foo", [], []], [{"Str" => "foo"}]] # [ヘッダレベル,  [内容,[],[]], [{"Str"=>中身}]]
+      json[1][0]["Header"].first.should == 1
+      json[1][0]["Header"].last.should == [{"Str" => "foo"}] # [ヘッダレベル,  [内容,[],[]], [{"Str"=>中身}]]
       json[1][1]["CodeBlock"].size.should == 2
       json[1][1]["CodeBlock"][0].should == ["", [], []]    # ["",  [ブロックのfiletype],  []]
       json[1][1]["CodeBlock"][1].should == %Q!print "hello"! # ソース
@@ -47,7 +48,8 @@ EOS
 
       json.size.should == 2
       json[1].size.should == 4
-      json[1][0]["Header"].should == [3, ["each文", [], []], [{"Str" => "each文"}]]
+      json[1][0]["Header"].first.should == 3
+      json[1][0]["Header"].last.should  == [{"Str" => "each文"}]
       json[1][1]["CodeBlock"].size.should == 2
       json[1][1]["CodeBlock"][0].should == ["", ["ruby"], []]  # ["",  [ブロックのfiletype],  []]
       json[1][1]["CodeBlock"][1].should == <<EOS.rstrip
