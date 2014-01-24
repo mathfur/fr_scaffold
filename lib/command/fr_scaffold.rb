@@ -1,72 +1,104 @@
-#!/usr/bin/env ruby
 # coding: utf-8
 
-require 'getoptlong'
-
 usage = <<EOS
-Usage: fr_scaffold [options]
--h --help    Display help.
--v --version Display version information and exit.
+Usage: fr_scaffold [options] input_filename output_filename
+-h  --help           Display help.
+-v  --version        Display version information and exit.
+-t  --template=fname Specify template file
+-l1 --layer1-to-2    Convert layer1 to layer2
+-l2 --layer2-to-3    Convert layer2 to layer3
+-r  --run            Run layer3 script
 EOS
 
 opts = GetoptLong.new(
-  ['--help', '-h', GetoptLong::NO_ARGUMENT],
-  ['--version', '-v', GetoptLong::NO_ARGUMENT]
+  ['--help',        '-h', GetoptLong::NO_ARGUMENT],
+  ['--version',     '-v', GetoptLong::NO_ARGUMENT],
+  ['--template',    '-t', GetoptLong::REQUIRED_ARGUMENT],
+  ['--layer1-to-2', '-1', GetoptLong::NO_ARGUMENT],
+  ['--layer2-to-3', '-2', GetoptLong::NO_ARGUMENT],
+  ['--run',         '-r', GetoptLong::NO_ARGUMENT]
 )
 
+command = nil
+template = nil
 begin
   opts.each do |opt, arg|
     case opt
     when '--help'; puts usage; exit
     when '--version'; puts FrScaffold::VERSION; exit
+    when '--template'
+      template = arg
+    when '--layer1-to-2'
+      command = :layer1_to_2
+    when '--layer2-to-3'
+      command = :layer2_to_3
+    when '--run'
+      command = :run_layer3
     end
   end
 rescue StandardError => e
   puts "wrong option" + e.inspect
+  puts e.backtrace
   exit
 end
 
-raise "TODO: 以下リファクタリング"
+input_filename = ARGV[0]
+output_filename = ARGV[1]
 
-require "erb"
+# ================================================
+# Validate existence of required options
 
-BASE_DIR = "#{ENV['HOME']}/.my_scaffold"
-SCAFFOLD_NAME = ENV['SCAFFOLD_NAME'] or raise 'Environment variable SCAFFOLD_NAME has to be specified.'
-
-CP_LIST = "#{BASE_DIR}/CP_LIST"
-MY_SCAFFOLD_ORIGIN = "#{BASE_DIR}/tmp/#{SCAFFOLD_NAME}"
-
-#system("git status")
-#
-#if $? > 0
-#  raise "need git"
-#end
-
-open(CP_LIST, 'w') do |f|
-  Dir.chdir(MY_SCAFFOLD_ORIGIN) do
-    f.write ERB.new(<<-'EOS', nil, '-').result(binding)
-#!/usr/bin/env ruby
-
-require "fileutils"
-
-def mkdir_and_copy(src, dst)
-  puts "#{src.inspect} => #{dst.inspect}"
-  FileUtils.mkdir_p(File.dirname(dst))
-  FileUtils.cp(src, dst)
+unless command
+  STDERR.puts "[ERROR] --layer* or --run option is required."
+  exit
 end
 
-MY_SCAFFOLD_TARGET_DIR = Dir.pwd
-Dir.chdir('<%= MY_SCAFFOLD_ORIGIN %>') do
-  <%- Dir["**/*"].select{|dir| File.file?(dir) }.each do |dir| -%>
-  mkdir_and_copy('<%= dir %>', "#{MY_SCAFFOLD_TARGET_DIR}/<%= dir %>")
-  <%- end -%>
+unless input_filename
+  STDERR.puts "input_filename is required."
+  exit
 end
-    EOS
+
+if (command == :layer1_to_2) or (command == :layer2_to_3)
+  unless output_filename
+    STDERR.puts "[ERROR] output_filename is required."
+    exit
+  end
+
+  if have_git_change?(output_filename)
+    STDERR.puts "[ERROR] output target have change."
+    exit
   end
 end
 
-system("vim #{CP_LIST}")
+# ================================================
 
-if File.size(CP_LIST) > 0
-  system("ruby #{CP_LIST}")
+case command
+when :layer1_to_2
+  output_content = YAML.load(ERB.new(File.read(input_filename), nil, '-').result)
+
+  open(output_filename, "w") do |f|
+    f.write YAML.dump(output_content)
+  end
+when :layer2_to_3
+  outputter = FrScaffold::Outputter.new
+  outputter.layer2_input = YAML.load(ERB.new(File.read(input_filename), nil, '-').result)
+
+  raise "[ERROR] --template option is required." unless template
+
+  result = outputter.load_from_md(template)
+  l2_template = {}
+  result.each do |hash|
+    l2_template[hash[:header]] ||= {}
+    l2_template[hash[:header]][hash[:fname]] = hash[:code_block]
+  end
+  outputter.l2_template = l2_template
+  outputter.layer3_input = outputter.to_file_content_pairs
+
+  open(output_filename, "w") do |f|
+    f.write outputter.layer3_output(TARGET_DIR)
+  end
+when :run_layer3
+  load input_filename
+else
+  raise "wrong command: #{command.inspect}"
 end

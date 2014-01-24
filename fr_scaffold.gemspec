@@ -1,13 +1,16 @@
 # coding: utf-8
 
+$:.push File.expand_path("../lib",  __FILE__)
+require "fr_scaffold/version"
+
 Gem::Specification.new do |s|
   s.name = "fr_scaffold"
   s.version = FrScaffold::VERSION
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["mathfur"]
-  s.date = "2014-01-19"
-  s.description = ""
+  s.date = "2014-01-26"
+  s.description = "Generate files for first commit."
   s.email = "mathfuru@gmail.com"
   s.executables = ["fr_scaffold"]
   s.extra_rdoc_files = [
@@ -54,4 +57,3 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<jeweler>, ["~> 1.6.4"])
   end
 end
-
