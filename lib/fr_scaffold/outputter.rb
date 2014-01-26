@@ -4,6 +4,7 @@ module FrScaffold
   class Outputter
     attr_reader :working_dir
     attr_accessor :layer2_input
+    attr_accessor :layer2_output_todo
     attr_accessor :layer3_input
 
     attr_accessor :l2_template
@@ -11,17 +12,21 @@ module FrScaffold
     def initialize(options={})
       options.assert_valid_keys(:working_dir)
 
+      self.layer2_output_todo ||= []
+
       @working_dir = options[:working_dir] || TMP_DIR
     end
 
     def load_layer1_from_md(fname)
-      template = self.load_from_md(fname)
+      template_data = self.load_from_md(fname)
 
       self.l2_template = {}
-      template.each do |hash|
-        self.l2_template[hash[:header]] ||= {}
-        self.l2_template[hash[:header]][hash[:fname]] = hash[:code_block]
+      template_data.select{|hash| hash[:fname] }.each do |hash|
+        self.l2_template[hash[:header2]] ||= {}
+        self.l2_template[hash[:header2]][hash[:fname]] = hash[:code_block]
       end
+
+      self.layer2_output_todo = template_data.map{|hash| hash[:other] }.compact
     end
 
     def load_from_md(fname)
@@ -94,7 +99,7 @@ module FrScaffold
         end
       end
 
-      result.select{|hash| hash[:fname] }.map{|hash| {:header => hash[:header2], :fname => hash[:fname], :code_block => hash[:code_block]}}
+      result
     end
 
     def to_file_content_pairs
@@ -119,6 +124,11 @@ module FrScaffold
       output << "require 'erb'"
       output << ""
       output << "include FrScaffold::Layer3Helper"
+      output << ""
+
+      output << "# TODO:"
+      output += self.layer2_output_todo.map{|line| "# #{line}" }
+
       output << ""
       output << ""
 
