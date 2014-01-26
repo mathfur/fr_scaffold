@@ -108,10 +108,11 @@ module FrScaffold
 
       self.layer3_input.each do |path, content|
         output << <<EOS
-  not_exist_then_create_dir("#{dst_dir}/#{path}")
-  if_git_change_then_exit("#{dst_dir}/#{path}")
+  target = "#{dst_dir}/#{path}"
+  not_exist_then_create_dir(target)
+  if_git_change_then_exit(target)
 
-  open("#{dst_dir}/#{path}", "w") do |f|
+  open(target, "w") do |f|
     f.puts(ERB.new(<<-'IIIIIII', nil, '-').result)
 #{content}
                       IIIIIII
