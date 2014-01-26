@@ -2,8 +2,10 @@ language: ruby
 
 script:
  - rspec
- - bin/fr_scaffold --help
- - bin/fr_scaffold --version
+ - gem build fr_scaffold.gemspec
+ - gem install fr_scaffold-0.0.2.gem
+ - fr_scaffold --help
+ - fr_scaffold --version
 
 rvm:
   - 2.0.0
