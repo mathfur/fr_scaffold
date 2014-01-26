@@ -64,8 +64,12 @@ module FrScaffold
           else
             line_ = line.strip.gsub(/【.*?】/, '').gsub(/\(.*?\)/, '')
 
-            if line_ =~ /\A(.*?([a-z0-9_]\s*|\s+))を?作成\??\s*\Z/
-              result.last[:fname]      = line_
+            if line_ =~ /\A(?<fname>.*?([a-z0-9_\/]\s*|\s+))を?作成\??\s*\Z/
+              if result.last[:fname]
+                result << result.last.clone
+              end
+
+              result.last[:fname]      = $~[:fname].strip
               result.last[:code_block] = nil
               result.last[:other]      = nil
             else
@@ -84,18 +88,18 @@ module FrScaffold
     end
 
     def to_file_content_pairs
-      files = []
+      paths = []
 
       self.layer2_input.each do |elem|
         case elem['tag']
         when "template"
-          files += self.l2_template[elem['name']].to_a
+          paths += self.l2_template[elem['name']].to_a
         when "entry"
-          files << [elem['name'], '']
+          paths << [elem['name'], '']
         end
       end
 
-      files
+      paths
     end
 
     def layer3_output(dst_dir, options={})
@@ -105,10 +109,16 @@ module FrScaffold
       output << "require 'erb'"
       output << ""
       output << "include FrScaffold::Layer3Helper"
+      output << ""
+      output << ""
 
       self.layer3_input.each do |path, content|
-        output << <<EOS
-  target = "#{dst_dir}/#{path}"
+        output << %Q!  target = "#{dst_dir}/#{path}"!
+
+        if path =~ %r{\/$}
+          output << "  FileUtils.mkdir_p(target)"
+        else
+          output << <<EOS
   not_exist_then_create_dir(target)
   if_git_change_then_exit(target)
 
@@ -118,6 +128,8 @@ module FrScaffold
                       IIIIIII
   end
 EOS
+        end
+
         output << ""
       end
 
