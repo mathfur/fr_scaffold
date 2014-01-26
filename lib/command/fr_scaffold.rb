@@ -85,13 +85,7 @@ when :layer2_to_3
 
   raise "[ERROR] --template option is required." unless template
 
-  result = outputter.load_from_md(template)
-  l2_template = {}
-  result.each do |hash|
-    l2_template[hash[:header]] ||= {}
-    l2_template[hash[:header]][hash[:fname]] = hash[:code_block]
-  end
-  outputter.l2_template = l2_template
+  outputter.load_layer1_from_md(template)
   outputter.layer3_input = outputter.to_file_content_pairs
 
   open(output_filename, "w") do |f|

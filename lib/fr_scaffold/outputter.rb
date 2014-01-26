@@ -14,6 +14,16 @@ module FrScaffold
       @working_dir = options[:working_dir] || TMP_DIR
     end
 
+    def load_layer1_from_md(fname)
+      template = self.load_from_md(fname)
+
+      self.l2_template = {}
+      template.each do |hash|
+        self.l2_template[hash[:header]] ||= {}
+        self.l2_template[hash[:header]][hash[:fname]] = hash[:code_block]
+      end
+    end
+
     def load_from_md(fname)
       lines = File.read(fname).split("\n")
 
