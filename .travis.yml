@@ -1,10 +1,5 @@
 language: ruby
 
-before_install:
- - sudo apt-get update -qq
- - sudo apt-get install -qq pandoc
- - pandoc --version
-
 script:
  - rspec
  - bin/fr_scaffold --help
