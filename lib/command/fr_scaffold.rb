@@ -16,7 +16,8 @@ opts = GetoptLong.new(
   ['--template',    '-t', GetoptLong::REQUIRED_ARGUMENT],
   ['--layer1-to-2', '-1', GetoptLong::NO_ARGUMENT],
   ['--layer2-to-3', '-2', GetoptLong::NO_ARGUMENT],
-  ['--run',         '-r', GetoptLong::NO_ARGUMENT]
+  ['--layer3-to-4', '-3', GetoptLong::NO_ARGUMENT],
+  ['--run-layer4',  '-r', GetoptLong::NO_ARGUMENT]
 )
 
 command = nil
@@ -32,8 +33,10 @@ begin
       command = :layer1_to_2
     when '--layer2-to-3'
       command = :layer2_to_3
-    when '--run'
-      command = :run_layer3
+    when '--layer3-to-4'
+      command = :layer3_to_4
+    when '--run-layer4'
+      command = :run_layer4
     end
   end
 rescue StandardError => e
@@ -58,7 +61,7 @@ unless input_filename
   exit
 end
 
-if (command == :layer1_to_2) or (command == :layer2_to_3)
+if command.to_s =~ /^layer/
   unless output_filename
     STDERR.puts "[ERROR] output_filename is required."
     exit
@@ -72,6 +75,8 @@ end
 
 # ================================================
 
+outputter = FrScaffold::Outputter.new
+
 case command
 when :layer1_to_2
   output_content = YAML.load(ERB.new(File.read(input_filename), nil, '-').result)
@@ -80,18 +85,23 @@ when :layer1_to_2
     f.write YAML.dump(output_content)
   end
 when :layer2_to_3
-  outputter = FrScaffold::Outputter.new
   outputter.layer2_input = YAML.load(ERB.new(File.read(input_filename), nil, '-').result)
 
   raise "[ERROR] --template option is required." unless template
 
-  outputter.load_layer1_from_md(template)
+  outputter.load_template_from_md(template)
   outputter.layer3_input = outputter.to_file_content_pairs
 
   open(output_filename, "w") do |f|
     f.write outputter.layer3_output(TARGET_DIR)
   end
-when :run_layer3
+when :layer3_to_4
+  outputter.layer4_input = YAML.load(ERB.new(File.read(input_filename), nil, '-').result)
+
+  open(output_filename, "w") do |f|
+    f.write outputter.layer4_output(TARGET_DIR)
+  end
+when :run_layer4
   load input_filename
 else
   raise "wrong command: #{command.inspect}"

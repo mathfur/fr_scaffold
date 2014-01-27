@@ -6,6 +6,7 @@ module FrScaffold
     attr_accessor :layer2_input
     attr_accessor :layer2_output_todo
     attr_accessor :layer3_input
+    attr_accessor :layer4_input
 
     attr_accessor :l2_template
 
@@ -17,7 +18,7 @@ module FrScaffold
       @working_dir = options[:working_dir] || TMP_DIR
     end
 
-    def load_layer1_from_md(fname)
+    def load_template_from_md(fname)
       template_data = self.load_from_md(fname)
 
       self.l2_template = {}
@@ -84,9 +85,9 @@ module FrScaffold
                 result << result.last.clone
               end
 
-              result.last[:fname]      = $~[:fname].strip
-              result.last[:code_block] = nil
-              result.last[:other]      = nil
+            result.last[:fname]      = $~[:fname].strip
+            result.last[:code_block] = nil
+            result.last[:other]      = nil
             else
               result.last[:other]      = line
 
@@ -117,7 +118,58 @@ module FrScaffold
       paths
     end
 
-    def layer3_output(dst_dir, options={})
+    # Output Example:
+    # todo:
+    #   - aaa
+    #   - bbb
+    # candidates:
+    #   - file: Gemfile
+    #   - file: lib/fr_scaffold/main.rb
+    #   - dir: spec/
+    # contents:
+    #   - file: lib/fr_scaffold/main.rb
+    #   - content: ..
+    #
+    def layer3_output(options={})
+      output = []
+
+      output << "candidates:"
+      self.layer3_input.each do |path, _|
+        if path =~ %r{\/$}
+          output << "  - dir: #{path}"
+        else
+          output << "  - file: #{path}"
+        end
+      end
+
+      output << ""
+
+      output << "task:"
+      output << "  - replace:"
+      output << "    - 'アプリ名': 'アプリ名'"
+      output << "      '0.0.0': '0.0.0'"
+
+      output << ""
+
+      output << "todo:"
+      self.layer2_output_todo.each do |line|
+        output << "  - '#{line.gsub("'", "\\'")}'"
+      end
+
+      output << ""
+      output << "contents:"
+      self.layer3_input.each do |path, content|
+        if path !~ %r{\/$}
+          output << "  - file: #{path}"
+          output << "    content: |+"
+          output << "     #{content.split("\n").join("\n     ")}"
+        end
+      end
+
+      output.join("\n")
+    end
+
+    def layer4_output(dst_dir, options={})
       output = []
 
       output << "#coding: utf-8"
@@ -127,17 +179,24 @@ module FrScaffold
       output << ""
 
       output << "# TODO:"
-      output += self.layer2_output_todo.map{|line| "# #{line}" }
+      output += self.layer4_input["todo"].map{|line| "# #{line}" }
 
       output << ""
       output << ""
 
-      self.layer3_input.each do |path, content|
-        output << %Q!  target = "#{dst_dir}/#{path}"!
+      self.layer4_input["candidates"].each do |hash|
+        tag = hash.keys.first
+        path = hash.values.first
+        content = self.layer4_input["contents"].map{|hash| hash['file'] == path ? hash['content'] : nil }.compact.first
 
-        if path =~ %r{\/$}
+        if tag == "dir" or tag == "file"
+          output << %Q!  target = "#{dst_dir}/#{path}"!
+        end
+
+        case tag
+        when 'dir'
           output << "  FileUtils.mkdir_p(target)"
-        else
+        when 'file'
           output << <<EOS
   not_exist_then_create_dir(target)
   if_git_change_then_exit(target)
@@ -148,12 +207,24 @@ module FrScaffold
                       IIIIIII
   end
 EOS
+        when 'tag'
+          raise "No Implementation"
+        else
+          raise "tag #{tag.inspect} is wrong"
         end
 
         output << ""
       end
 
-      output.join("\n")
+      result = output.join("\n")
+
+      self.layer4_input['task'][0]['replace'].each do |hash|
+        hash.each do |from, to|
+          result = result.gsub(from, to)
+        end
+      end
+
+      result
     end
   end
 end

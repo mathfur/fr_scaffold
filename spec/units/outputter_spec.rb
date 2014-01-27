@@ -10,23 +10,25 @@ describe FrScaffold::Outputter do
   end
 
   describe "#to_file_content_pairs" do
-    before(:all) { @outputter = Outputter.new }
+    before(:all) do
+      @outputter = Outputter.new
+      @outputter.l2_template = {
+         "ruby初期設定" => {
+                             ".gitignore"      => "log/",
+                             "lib/アプリ名.rb" => ["# coding: utf-8", "", "print 'hello'"].join("\n")
+                           },
+         "haskell初期設定" => {
+                             ".gitignore"  => %w{cabal-dev *.o}.join("\n"),
+                             "src/Main.hs" => "main = print 'hello'"
+                           }
+      }
+    end
 
     describe "case 1" do
       before(:all) do
         @outputter.layer2_input = [
           {'tag' => "template", 'name' => "haskell初期設定"}
         ]
-        @outputter.l2_template = {
-           "ruby初期設定" => {
-                               ".gitignore"      => "log/",
-                               "lib/アプリ名.rb" => ["# coding: utf-8", "", "print 'hello'"].join("\n")
-                             },
-           "haskell初期設定" => {
-                               ".gitignore"  => %w{cabal-dev *.o}.join("\n"),
-                               "src/Main.hs" => "main = print 'hello'"
-                             }
-        }
       end
 
       specify do
@@ -44,16 +46,6 @@ describe FrScaffold::Outputter do
           {'tag' => "template", 'name' => "haskell初期設定"},
           {'tag' => "entry",    'name' => 'README.md'}
         ]
-        @outputter.l2_template = {
-           "ruby初期設定" => {
-                               ".gitignore"      => "log/",
-                               "lib/アプリ名.rb" => ["# coding: utf-8", "", "print 'hello'"].join("\n")
-                             },
-           "haskell初期設定" => {
-                               ".gitignore"  => %w{cabal-dev *.o}.join("\n"),
-                               "src/Main.hs" => "main = print 'hello'"
-                             }
-        }
       end
 
       specify do

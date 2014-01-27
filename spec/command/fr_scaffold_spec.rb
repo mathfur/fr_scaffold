@@ -10,7 +10,8 @@ describe "Command fr_scaffold test" do
 
     @layer1_fname = "#{@working_dir}/fr_scaffold_files/layer1.yaml.erb"
     @layer2_fname = "#{@working_dir}/fr_scaffold_files/layer2.yaml.erb"
-    @layer3_fname = "#{@working_dir}/fr_scaffold_files/layer3.rb"
+    @layer3_fname = "#{@working_dir}/fr_scaffold_files/layer3.yaml.erb"
+    @layer4_fname = "#{@working_dir}/fr_scaffold_files/layer4.rb"
 
     open(@layer1_fname, 'w') do |f|
       f.write <<-EOS
@@ -28,7 +29,7 @@ EOS
 ### first commit
 lib/アプリ名/ 作成
 
-bin/hello作成
+bin/hello 作成
 ```
 puts "HELLO"
 ```
@@ -55,10 +56,12 @@ EOS
       STDERR.puts `#{BASE_DIR}/bin/fr_scaffold --layer1-to-2                               #{@layer1_fname} #{@layer2_fname}`.inspect
       STDERR.puts "[layer2-3]"
       STDERR.puts `#{BASE_DIR}/bin/fr_scaffold --layer2-to-3 --template=#{@template_fname} #{@layer2_fname} #{@layer3_fname}`.inspect
+      STDERR.puts "[layer3-4]"
+      STDERR.puts `#{BASE_DIR}/bin/fr_scaffold --layer3-to-4                               #{@layer3_fname} #{@layer4_fname}`.inspect
       STDERR.puts "[run]"
-      STDERR.puts `#{BASE_DIR}/bin/fr_scaffold --run                                       #{@layer3_fname}`.inspect
+      STDERR.puts `#{BASE_DIR}/bin/fr_scaffold --run                                       #{@layer4_fname}`.inspect
 
-      `rspec`.should be_include("1 example, 0 failures")
+      `rspec`.should =~ /\b1 example, 0 failures\b/
       `ruby #{@working_dir}/bin/hello`.should be_include("HELLO")
     end
   end
