@@ -162,7 +162,7 @@ module FrScaffold
         if path !~ %r{\/$}
           output << "  - file: #{path}"
           output << "    content: |+"
-          output << "     #{content.split("\n").join("\n     ")}"
+          output << "     #{(content || '').split("\n").join("\n     ")}"
         end
       end
 
@@ -201,7 +201,7 @@ module FrScaffold
   not_exist_then_create_dir(target)
   if_git_change_then_exit(target)
 
-  open(target, "w") do |f|
+  create_source(target) do |f|
     f.puts(ERB.new(<<-'IIIIIII', nil, '-').result)
 #{content}
                       IIIIIII

@@ -22,6 +22,19 @@ Memo
 ----
 * templateの作成するファイル名部分の【】, ()はコメントと見なされ、ファイル名作成には使われない
 
+Layer3 Memo
+-----------
+```
+create_source("/foo/bar") do |f|
+  f.puts(ERB.new(<<-'IIIIIII',  nil,  '-').result)
+aaaa
+                     IIIIIII
+  f.klass 'User' do |f2|
+    f2.def_ 'full_name'
+  end
+end
+```
+
 Code Status
 ------------------
 ![build status](https://travis-ci.org/mathfur/fr_scaffold.png)

@@ -15,5 +15,55 @@ module FrScaffold
         exit
       end
     end
+
+    def create_source(fname, &block)
+      open(fname, 'w') do |f|
+        Sandbox.new(self).instance_exec(FilePointerWrapper.new(f), &block)
+      end
+    end
+
+    class FilePointerWrapper
+      attr_accessor :indent
+
+      def initialize(fp, indent=0)
+        @fp = fp
+        @indent = indent
+      end
+
+      def klass(klass_name, &block)
+        indent = ' '*@indent
+
+        @fp.puts "#{indent}class #{klass_name}"
+        new_fp = FilePointerWrapper.new(@fp, @indent+2)
+        block.call(new_fp) if block_given?
+        @fp.puts "#{indent}end"
+      end
+
+      def def_(name, &block)
+        indent = ' '*@indent
+
+        @fp.puts "#{indent}def #{name}"
+        new_fp = FilePointerWrapper.new(@fp, @indent+2)
+        block.call(new_fp) if block_given?
+        @fp.puts "#{indent}end"
+      end
+
+      def method_missing(name, *args, &block)
+        @fp.send(name, *args, &block)
+      end
+    end
+
+    class Sandbox
+      def initialize(base)
+        @base = base
+      end
+
+      def klass(klass_name, &block)
+      end
+
+      def method_missing(name, *args, &block)
+        @base.send(name, *args, &block)
+      end
+    end
   end
 end
