@@ -49,6 +49,29 @@ input_filename = ARGV[0]
 output_filename = ARGV[1]
 
 # ================================================
+# If filenames are not specified, use read .fr_scaffold.yaml
+
+config = File.exist?(CONFIG_FILE) && YAML.load_file(CONFIG_FILE)
+
+if !input_filename and !output_filename and config
+  case command
+  when :layer1_to_2
+    input_filename  = config['layer1']
+    output_filename = config['layer2']
+  when :layer2_to_3
+    input_filename  = config['layer2']
+    output_filename = config['layer3']
+  when :layer3_to_4
+    input_filename  = config['layer3']
+    output_filename = config['layer4']
+  when :run_layer4
+    input_filename  = config['layer4']
+  end
+end
+
+template ||= (config && config['template'])
+
+# ================================================
 # Validate existence of required options
 
 unless command

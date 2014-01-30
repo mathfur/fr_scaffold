@@ -15,3 +15,4 @@ require "helper"
 BASE_DIR = "#{File.dirname(__FILE__)}/.."
 TARGET_DIR = Dir.pwd
 TMP_DIR = "#{BASE_DIR}/tmp"
+CONFIG_FILE = "#{TARGET_DIR}/.fr_scaffold.yml"
