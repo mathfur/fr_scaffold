@@ -11,16 +11,26 @@ Usage
 -----
  1. Create project directory.
  2. Create fr_scaffold_files directry in the project directory.
- 3. Write fr_scaffold_files/layer1.yaml.erb, like as follow.
+ 3. Prepare markdown file as follow to use template.
 ```
-- tag: template
-  name: ruby first commit
+# language name
+## group1
+### first commit
+filename
+codeblock
+filename
+codeblock
+...
+
+## group2
 ```
- 4. Run "fr_scaffold --layer1-to-2 fr_scaffold_files/layer1.yaml.erb fr_scaffold_files/layer2.yaml.erb" to create layer2.yaml.erb
- 5. Edit layer2.yaml.erb
- 6. Run "fr_scaffold --layer2-to-3 fr_scaffold_files/layer2.yaml.erb fr_scaffold_files/layer3.rb" to create layer3.rb
- 7. Edit layer3.rb
- 8. Run "fr_scaffold --run fr_scaffold_files/layer3.rb" to create target project files.
+ 4. Run "fr_scaffold --init --template=foo.md"
+ 5. Edit layer1.yaml.erb
+ 6. Run "fr_scaffold --layer1-to-2" to create layer2.yaml.erb
+ 7. Edit layer2.yaml.erb
+ 8. Run "fr_scaffold --layer2-to-3" to create layer3.rb
+ 9. Edit layer3.rb
+ 10. Run "fr_scaffold --run" to create target project files.
 
 Memo
 ----

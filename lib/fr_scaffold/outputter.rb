@@ -9,25 +9,29 @@ module FrScaffold
     attr_accessor :layer4_input
 
     attr_accessor :l2_template
+    attr_accessor :template_data
 
     def initialize(options={})
-      options.assert_valid_keys(:working_dir)
+      options.assert_valid_keys(:working_dir, :template)
 
       self.layer2_output_todo ||= []
-
       @working_dir = options[:working_dir] || TMP_DIR
+      if options[:template]
+        @template_data = self.load_from_md(options[:template])
+        load_template_from_md(options[:template])
+      end
     end
 
     def load_template_from_md(fname)
-      template_data = self.load_from_md(fname)
-
       self.l2_template = {}
-      template_data.select{|hash| hash[:fname] }.each do |hash|
-        self.l2_template[hash[:header2]] ||= {}
-        self.l2_template[hash[:header2]][hash[:fname]] = hash[:code_block]
+
+      @template_data.select{|hash| hash[:fname] }.each do |hash|
+        cat_header = "#{hash[:header1]}:#{hash[:header2]}:#{hash[:header3]}"
+        self.l2_template[cat_header] ||= {}
+        self.l2_template[cat_header][hash[:fname]] = hash[:code_block]
       end
 
-      self.layer2_output_todo = template_data.map{|hash| hash[:other] }.compact
+      self.layer2_output_todo = @template_data.map{|hash| hash[:other] }.compact
     end
 
     def load_from_md(fname)
@@ -57,7 +61,7 @@ module FrScaffold
         else
           # outside code_block
           case line
-          when /\A```\Z/
+          when /\A```[a-zA-Z0-9_-]*\Z/
             inside_code_block = true
           when /\A# (.*)\Z/
             result.last[:header1]    = $1
@@ -101,6 +105,10 @@ module FrScaffold
       end
 
       result
+    end
+
+    def template_names
+      @template_data.select{|e| e[:fname] && e[:code_block].present? }.map{|e| "#{e[:header1]}:#{e[:header2]}:#{e[:header3]}" }.sort.uniq
     end
 
     def to_file_content_pairs
@@ -153,7 +161,7 @@ module FrScaffold
 
       output << "todo:"
       self.layer2_output_todo.each do |line|
-        output << "  - '#{line.gsub("'", "\\'")}'"
+        output << "  - '#{line.gsub("'", "''")}'"
       end
 
       output << ""
@@ -179,7 +187,7 @@ module FrScaffold
       output << ""
 
       output << "# TODO:"
-      output += self.layer4_input["todo"].map{|line| "# #{line}" }
+      output += self.layer4_input["todo"].map{|line| "# #{line}".strip }
 
       output << ""
       output << ""
