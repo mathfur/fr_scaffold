@@ -3,7 +3,7 @@ language: ruby
 script:
  - rspec
  - gem build fr_scaffold.gemspec
- - gem install fr_scaffold-0.0.2.gem
+ - gem install fr_scaffold-0.0.3.gem
  - fr_scaffold --help
  - fr_scaffold --version
 

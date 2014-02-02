@@ -5,7 +5,7 @@ Generate files for first commit.
 Install
 -------
  1. gem build fr_scaffold.gemspec
- 2. gem install fr_scaffold-0.0.2.gem
+ 2. gem install fr_scaffold-0.0.3.gem
 
 Usage
 -----
